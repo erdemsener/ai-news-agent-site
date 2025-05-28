@@ -4,21 +4,33 @@ import { NextResponse } from 'next/server';
 const HN_API = 'https://hacker-news.firebaseio.com/v0/topstories.json';
 const HN_ITEM = 'https://hacker-news.firebaseio.com/v0/item/';
 
-async function fetchHackerNews(limit = 10) {
+type HackerNewsItem = {
+  id: number;
+  title: string;
+  url?: string;
+  by?: string;
+  score?: number;
+  time?: number;
+  type?: string;
+  descendants?: number;
+  // Diğer alanlar eklenebilir
+};
+
+async function fetchHackerNews(limit = 10): Promise<HackerNewsItem[]> {
   const idsRes = await fetch(HN_API);
-  const ids = await idsRes.json();
+  const ids: number[] = await idsRes.json();
   const topIds = ids.slice(0, limit);
   const items = await Promise.all(
-    topIds.map(async (id: any) => {
+    topIds.map(async (id: number) => {
       const res = await fetch(`${HN_ITEM}${id}.json`);
-      return res.json();
+      return res.json() as Promise<HackerNewsItem>;
     })
   );
   return items;
 }
 
 // Basit özetleme ve etiketleme (dummy, LLM ile geliştirilecek)
-function summarizeAndTag(item: { title: any; }) {
+function summarizeAndTag(item: HackerNewsItem) {
   return {
     ...item,
     summary: item.title,
@@ -27,17 +39,13 @@ function summarizeAndTag(item: { title: any; }) {
 }
 
 // OpenAI özetleme fonksiyonu
-async function summarizeAndTagWithLLM(item: { title: string; url?: string; }) {
-  // OpenAI API anahtarınızı .env dosyasına OPENAI_API_KEY olarak ekleyin
+async function summarizeAndTagWithLLM(item: HackerNewsItem) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     // Anahtar yoksa dummy özetle dön
     return summarizeAndTag(item);
   }
-  const prompt = `Bir haber başlığını özetle ve 2-3 anahtar kelimeyle etiketle:
-Başlık: ${item.title}
-URL: ${item.url || ''}
-Yanıt formatı: {\"summary\": \"...\", \"tags\": [\"etiket1\", \"etiket2\"]}`;
+  const prompt = `Bir haber başlığını özetle ve 2-3 anahtar kelimeyle etiketle:\nBaşlık: ${item.title}\nURL: ${item.url || ''}\nYanıt formatı: {\"summary\": \"...\", \"tags\": [\"etiket1\", \"etiket2\"]}`;
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
