@@ -104,6 +104,9 @@ export default function Home() {
           </div>
         )}
       </div>
+      <div className="absolute top-4 right-6 z-50 text-xs text-cyan-800 font-semibold bg-white/80 px-4 py-2 rounded-full shadow border border-cyan-200 select-none">
+        Created by Copilot — Erdem Şener
+      </div>
     </main>
   );
 }
