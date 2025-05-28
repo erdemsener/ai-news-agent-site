@@ -29,15 +29,6 @@ async function fetchHackerNews(limit = 10): Promise<HackerNewsItem[]> {
   return items;
 }
 
-// Basit özetleme ve etiketleme (dummy, LLM ile geliştirilecek)
-function summarizeAndTag(item: HackerNewsItem) {
-  return {
-    ...item,
-    summary: item.title,
-    tags: ['AI', 'Tech'],
-  };
-}
-
 // Gemini API ile özetleme fonksiyonu
 async function summarizeWithGemini(title: string): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY || "AIzaSyA17G1j7TaA1EoSf4EjmdP8zuhhFlcNt8g";
