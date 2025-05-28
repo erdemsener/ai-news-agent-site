@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 
 // Basit Hacker News API örneği (Google News API anahtar gerektiriyor, HN ücretsiz)
 const HN_API = 'https://hacker-news.firebaseio.com/v0/topstories.json';
@@ -69,7 +69,7 @@ async function summarizeAndTagWithLLM(item: HackerNewsItem) {
   }
 }
 
-export async function GET(request: { url: string | URL; }) {
+export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const limit = parseInt(searchParams.get('limit') || '10', 10);
   const items = await fetchHackerNews(limit);
