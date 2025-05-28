@@ -105,12 +105,20 @@ const questions = [
   },
 ];
 
+interface LLMForm {
+  purpose?: string;
+  longDocs?: string;
+  free?: string;
+  language?: string;
+  privacy?: string;
+}
+
 const FormLLMRecommender = ({
   onSelect,
 }: {
   onSelect: (modelName: string) => void;
 }) => {
-  const [form, setForm] = useState<any>({});
+  const [form, setForm] = useState<LLMForm>({});
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,7 +155,7 @@ const FormLLMRecommender = ({
             </label>
             <select
               className="w-full border p-2 rounded-md shadow-sm"
-              value={form[q.key] || ''}
+              value={form[q.key as keyof LLMForm] || ''}
               onChange={(e) => setForm({ ...form, [q.key]: e.target.value })}
               required
             >
