@@ -154,20 +154,20 @@ export default function LLMPage() {
   const selected = models.find((m) => m.name === selectedModel);
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-100 to-white py-16 px-4">
+    <main className="min-h-screen bg-gradient-to-br from-[#e0f2fe] to-[#f8fafc] py-16 px-4">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-5xl font-extrabold mb-6 text-center text-blue-800 tracking-tight">
+        <h1 className="text-5xl font-extrabold mb-6 text-center text-blue-800 tracking-tight drop-shadow-lg">
           🤖 LLM Comparator
         </h1>
-        <p className="text-center text-gray-600 mb-14 text-lg">
-          Compare and find the best language model for your needs.
+        <p className="text-center text-blue-700 mb-14 text-xl">
+          Kişisel ihtiyaçlarına göre en iyi dil modelini bul!
         </p>
 
         <FormLLMRecommender onSelect={setSelectedModel} />
 
         {selected && (
-          <div className="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition duration-300 max-w-3xl mx-auto mt-12">
-            <h2 className="text-2xl font-semibold mb-4 text-blue-700 text-center">
+          <div className="bg-white rounded-3xl p-8 shadow-2xl hover:shadow-blue-200 transition duration-300 max-w-3xl mx-auto mt-12 border-2 border-blue-100">
+            <h2 className="text-3xl font-bold mb-4 text-blue-700 text-center">
               {selected.name}
             </h2>
             <div>
