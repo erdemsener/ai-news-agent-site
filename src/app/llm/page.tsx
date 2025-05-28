@@ -58,26 +58,77 @@ const models: ModelSWOT[] = [
   },
 ];
 
+const questions = [
+  {
+    key: 'purpose',
+    label: "What’s your main purpose?",
+    options: [
+      { value: 'coding', label: 'Coding' },
+      { value: 'writing', label: 'Content Writing' },
+      { value: 'chat', label: 'Customer Chat / Helpdesk' },
+      { value: 'research', label: 'Academic/Research' },
+      { value: 'summarization', label: 'Summarization' },
+    ],
+  },
+  {
+    key: 'longDocs',
+    label: 'Do you work with long documents?',
+    options: [
+      { value: 'yes', label: 'Yes' },
+      { value: 'no', label: 'No' },
+    ],
+  },
+  {
+    key: 'free',
+    label: 'Do you prefer free access?',
+    options: [
+      { value: 'yes', label: 'Yes' },
+      { value: 'no', label: 'No' },
+    ],
+  },
+  {
+    key: 'language',
+    label: 'Which language will you mostly use?',
+    options: [
+      { value: 'english', label: 'English' },
+      { value: 'turkish', label: 'Turkish' },
+      { value: 'multilingual', label: 'Multilingual' },
+    ],
+  },
+  {
+    key: 'privacy',
+    label: 'Is privacy or data residency important for you?',
+    options: [
+      { value: 'yes', label: 'Yes' },
+      { value: 'no', label: 'No' },
+    ],
+  },
+];
+
 const FormLLMRecommender = ({
   onSelect,
 }: {
   onSelect: (modelName: string) => void;
 }) => {
-  const [form, setForm] = useState({
-    purpose: '',
-    longDocs: '',
-    free: '',
-  });
+  const [form, setForm] = useState<any>({});
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
+    // Basit mantık: daha fazla koşul eklendi
     if (form.purpose === 'coding') {
       onSelect('GPT-4o');
     } else if (form.longDocs === 'yes') {
       onSelect('Claude 3');
     } else if (form.free === 'yes') {
       onSelect('Gemini');
+    } else if (form.privacy === 'yes') {
+      onSelect('Mistral');
+    } else if (form.language === 'turkish') {
+      onSelect('Gemini');
+    } else if (form.purpose === 'summarization') {
+      onSelect('Claude 3');
+    } else if (form.purpose === 'research') {
+      onSelect('Claude 3');
     } else {
       onSelect('GPT-4o');
     }
@@ -89,58 +140,27 @@ const FormLLMRecommender = ({
         🔍 Which LLM Fits You?
       </h2>
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label className="block mb-1 font-medium text-gray-700">
-            What’s your main purpose?
-          </label>
-          <select
-            className="w-full border p-2 rounded-md shadow-sm"
-            value={form.purpose}
-            onChange={(e) => setForm({ ...form, purpose: e.target.value })}
-            required
-          >
-            <option value="">-- Select --</option>
-            <option value="coding">Coding</option>
-            <option value="writing">Content Writing</option>
-            <option value="chat">Customer Chat / Helpdesk</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block mb-1 font-medium text-gray-700">
-            Do you work with long documents?
-          </label>
-          <select
-            className="w-full border p-2 rounded-md shadow-sm"
-            value={form.longDocs}
-            onChange={(e) => setForm({ ...form, longDocs: e.target.value })}
-            required
-          >
-            <option value="">-- Select --</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block mb-1 font-medium text-gray-700">
-            Do you prefer free access?
-          </label>
-          <select
-            className="w-full border p-2 rounded-md shadow-sm"
-            value={form.free}
-            onChange={(e) => setForm({ ...form, free: e.target.value })}
-            required
-          >
-            <option value="">-- Select --</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-          </select>
-        </div>
-
+        {questions.map((q) => (
+          <div key={q.key}>
+            <label className="block mb-1 font-medium text-gray-700">
+              {q.label}
+            </label>
+            <select
+              className="w-full border p-2 rounded-md shadow-sm"
+              value={form[q.key] || ''}
+              onChange={(e) => setForm({ ...form, [q.key]: e.target.value })}
+              required
+            >
+              <option value="">-- Select --</option>
+              {q.options.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </div>
+        ))}
         <button
           type="submit"
-          className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition"
+          className="bg-cyan-500 text-white px-6 py-2 rounded-md hover:bg-emerald-400 transition"
         >
           Suggest LLM
         </button>

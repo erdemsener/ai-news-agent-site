@@ -60,7 +60,7 @@ export default function Home() {
             {articles.map((a, i) => (
               <div
                 key={a.id}
-                className="group bg-white/90 rounded-3xl p-0 shadow-xl hover:scale-[1.03] hover:bg-emerald-50 transition-all border border-cyan-100 hover:border-emerald-200 flex flex-col overflow-hidden relative min-h-[420px]"
+                className="group bg-white/90 rounded-3xl p-0 shadow-xl hover:scale-[1.03] hover:bg-emerald-50 transition-all border border-cyan-100 hover:border-emerald-200 flex flex-col overflow-hidden relative"
               >
                 <div className="relative w-full h-44 bg-gradient-to-br from-cyan-100 to-emerald-100 flex items-center justify-center">
                   <Image
@@ -77,27 +77,28 @@ export default function Home() {
                     </span>
                   ))}
                 </div>
-                <div className="px-6 pt-2 pb-6 flex flex-col flex-1">
+                <div className="px-6 pt-2 pb-4 flex flex-col flex-1">
                   <h2 className="text-xl font-bold group-hover:underline mb-2 text-cyan-900 line-clamp-2">
                     {a.title}
                   </h2>
-                  <p className="text-gray-700 text-base mb-4 line-clamp-3">
+                  <p className="text-gray-700 text-base mb-2 line-clamp-3">
                     {a.summary}
                   </p>
-                  <div className="flex items-center gap-3 mt-auto text-xs text-cyan-700">
+                  <div className="flex items-center gap-3 mt-auto text-xs text-cyan-700 pb-2">
                     <span>{a.by ? `by ${a.by}` : 'Kaynak: HN'}</span>
                     <span className="ml-auto">{a.score ? `${a.score} puan` : ''}</span>
                     <span>{a.time ? new Date(a.time * 1000).toLocaleDateString() : ''}</span>
                   </div>
-                  <a
-                    href={a.url || `https://news.ycombinator.com/item?id=${a.id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-6 w-full bg-gradient-to-r from-cyan-400 to-emerald-300 hover:from-cyan-500 hover:to-emerald-400 text-gray-900 font-bold py-2 rounded-xl shadow-lg text-center transition"
-                  >
-                    Habere Git
-                  </a>
                 </div>
+                <a
+                  href={a.url && a.url.startsWith('http') ? a.url : `https://news.ycombinator.com/item?id=${a.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="absolute inset-0 z-10"
+                  aria-label={a.title}
+                  tabIndex={-1}
+                  style={{ cursor: 'pointer' }}
+                />
               </div>
             ))}
           </div>
