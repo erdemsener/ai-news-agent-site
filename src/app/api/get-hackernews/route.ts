@@ -38,42 +38,48 @@ function summarizeAndTag(item: HackerNewsItem) {
   };
 }
 
-// OpenAI özetleme fonksiyonu
-async function summarizeAndTagWithLLM(item: HackerNewsItem) {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    // Anahtar yoksa dummy özetle dön
-    return summarizeAndTag(item);
-  }
-  const prompt = `Bir haber başlığını özetle ve 2-3 anahtar kelimeyle etiketle:\nBaşlık: ${item.title}\nURL: ${item.url || ''}\nYanıt formatı: {\"summary\": \"...\", \"tags\": [\"etiket1\", \"etiket2\"]}`;
-  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+// Gemini API ile özetleme fonksiyonu
+async function summarizeWithGemini(title: string): Promise<string> {
+  const apiKey = process.env.GEMINI_API_KEY || "AIzaSyA17G1j7TaA1EoSf4EjmdP8zuhhFlcNt8g";
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+  const prompt = `Aşağıdaki haber başlığını 1-2 cümlede özetle:
+${title}`;
+  const res = await fetch(url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'gpt-3.5-turbo',
-      messages: [{ role: 'user', content: prompt }],
-      max_tokens: 120,
-      temperature: 0.5,
+      contents: [{ parts: [{ text: prompt }] }],
     }),
   });
   const data = await res.json();
   try {
-    const content = data.choices?.[0]?.message?.content;
-    const parsed = JSON.parse(content);
-    return { ...item, summary: parsed.summary, tags: parsed.tags };
+    return data.candidates?.[0]?.content?.parts?.[0]?.text || title;
   } catch {
-    return summarizeAndTag(item);
+    return title;
   }
+}
+
+// Basit anahtar kelime çıkarıcı (etiket)
+function extractTags(title: string): string[] {
+  return title
+    .replace(/[^\w\s]/g, '')
+    .split(' ')
+    .filter((w) => w.length > 3)
+    .slice(0, 3)
+    .map((w) => w.toUpperCase());
 }
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const limit = parseInt(searchParams.get('limit') || '10', 10);
   const items = await fetchHackerNews(limit);
-  // LLM ile özetleme ve etiketleme
-  const processed = await Promise.all(items.map(summarizeAndTagWithLLM));
+  // Gemini ile özetleme ve anahtar kelime çıkarma
+  const processed = await Promise.all(
+    items.map(async (item) => {
+      const summary = await summarizeWithGemini(item.title);
+      const tags = extractTags(item.title);
+      return { ...item, summary, tags };
+    })
+  );
   return NextResponse.json({ articles: processed });
 }
